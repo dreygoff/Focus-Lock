@@ -1,10 +1,10 @@
 package com.gromov.focuslock.domain.model
 
-import android.graphics.drawable.Drawable
+import android.graphics.Bitmap
 
 data class InstalledApp(
     val appName: String,
     val packageName: String,
-    val icon: Drawable,
-    val isBlocked: Boolean
+    val icon: Bitmap,
+    val isLocked: Boolean
 )

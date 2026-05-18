@@ -4,15 +4,18 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.gromov.focuslock.domain.model.InstalledApp
 import com.gromov.focuslock.domain.usecase.GetInstalledAppsUseCase
+import com.gromov.focuslock.domain.usecase.ToggleAppLockUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class AppSelectionViewModel @Inject constructor(
-    private val getInstalledAppsUseCase: GetInstalledAppsUseCase
+    private val getInstalledAppsUseCase: GetInstalledAppsUseCase,
+    private val toggleAppLockUseCase: ToggleAppLockUseCase
 ) : ViewModel() {
 
     val installedApps: StateFlow<List<InstalledApp>> = getInstalledAppsUseCase().stateIn(
@@ -20,4 +23,11 @@ class AppSelectionViewModel @Inject constructor(
             started = SharingStarted.WhileSubscribed(5000),
             initialValue = emptyList()
         )
+
+    fun toggleAppLock(packageName: String, shouldBlock: Boolean) {
+        viewModelScope.launch {
+            toggleAppLockUseCase(packageName, shouldBlock)
+        }
+    }
+
 }

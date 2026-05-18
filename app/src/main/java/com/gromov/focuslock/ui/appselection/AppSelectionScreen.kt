@@ -23,28 +23,32 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.gromov.focuslock.domain.model.InstalledApp
 
 @Composable
 fun AppSelectionScreen(viewModel: AppSelectionViewModel) {
     val apps by viewModel.installedApps.collectAsStateWithLifecycle()
-    AppSelectionContent(apps = apps)
+    AppSelectionContent(
+        apps = apps,
+        onAppCheckedChange = { packageName, checked ->
+            viewModel.toggleAppLock(packageName, checked)
+        }
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AppSelectionContent(apps: List<InstalledApp>) {
+fun AppSelectionContent(
+    apps: List<InstalledApp>,
+    onAppCheckedChange: (String, Boolean) -> Unit
+) {
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -74,7 +78,7 @@ fun AppSelectionContent(apps: List<InstalledApp>) {
                 .fillMaxSize()
                 .background(color = Color.Yellow)
         ) {
-            items(apps) { app ->
+            items(apps, key = { it.packageName }) { app ->
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
@@ -84,10 +88,8 @@ fun AppSelectionContent(apps: List<InstalledApp>) {
                         .border(1.dp, Color.Black)
                         .padding(5.dp)
                 ) {
-                    var isBlocked by remember { mutableStateOf(false) }
-
                     Image(
-                        bitmap = app.icon.toBitmap().asImageBitmap(),
+                        bitmap = app.icon.asImageBitmap(),
                         contentDescription = null,
                         modifier = Modifier
                             .size(50.dp)
@@ -101,9 +103,9 @@ fun AppSelectionContent(apps: List<InstalledApp>) {
                     )
 
                     Switch(
-                        checked = isBlocked,
-                        onCheckedChange = {
-                            isBlocked = !isBlocked
+                        checked = app.isLocked,
+                        onCheckedChange = { newValue ->
+                            onAppCheckedChange(app.packageName, newValue)
                         },
                     )
                 }

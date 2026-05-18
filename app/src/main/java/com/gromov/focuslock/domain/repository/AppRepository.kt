@@ -5,5 +5,6 @@ import kotlinx.coroutines.flow.Flow
 
 interface AppRepository {
     fun getInstalledApps(): Flow<List<InstalledApp>>
-    fun blockApp()
+    suspend fun lockApp(packageName: String)
+    suspend fun unlockApp(packageName: String)
 }
