@@ -4,7 +4,7 @@ import android.content.Context
 import android.content.pm.PackageManager
 import androidx.room.Room
 import com.gromov.focuslock.data.local.AppDatabase
-import com.gromov.focuslock.data.local.dao.LockedAppDao
+import com.gromov.focuslock.data.local.dao.BlockedAppDao
 import com.gromov.focuslock.data.repository.AppRepositoryImpl
 import com.gromov.focuslock.domain.repository.AppRepository
 import dagger.Module
@@ -32,18 +32,20 @@ object DataModule {
         context = context,
         klass = AppDatabase::class.java,
         name = "focus_lock_db",
-    ).build()
+    )
+        .fallbackToDestructiveMigration(dropAllTables = true)
+        .build()
 
     @Provides
     @Singleton
-    fun provideLockedAppDao(
+    fun provideBlockedAppDao(
         database: AppDatabase
-    ): LockedAppDao = database.lockedAppDao()
+    ): BlockedAppDao = database.blockedAppDao()
 
     @Provides
     @Singleton
     fun provideAppRepository(
         packageManager: PackageManager,
-        lockedAppDao: LockedAppDao
-    ): AppRepository = AppRepositoryImpl(packageManager, lockedAppDao)
+        blockedAppDao: BlockedAppDao
+    ): AppRepository = AppRepositoryImpl(packageManager, blockedAppDao)
 }

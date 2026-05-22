@@ -5,15 +5,15 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
-class ToggleAppLockUseCase @Inject constructor(
-    private val repository: AppRepository
+class ToggleAppBlockUseCase @Inject constructor(
+    private val appRepository: AppRepository
 ) {
     suspend operator fun invoke(packageName: String, shouldBlock: Boolean) {
         withContext(Dispatchers.IO) {
             if (shouldBlock) {
-                repository.lockApp(packageName)
+                appRepository.blockApp(packageName)
             } else {
-                repository.unlockApp(packageName)
+                appRepository.unblockApp(packageName)
             }
         }
     }

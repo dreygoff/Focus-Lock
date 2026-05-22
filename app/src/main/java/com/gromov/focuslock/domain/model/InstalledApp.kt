@@ -6,5 +6,5 @@ data class InstalledApp(
     val appName: String,
     val packageName: String,
     val icon: Bitmap,
-    val isLocked: Boolean
+    val isBlocked: Boolean
 )

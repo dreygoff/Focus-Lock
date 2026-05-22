@@ -103,7 +103,7 @@ fun AppSelectionContent(
                     )
 
                     Switch(
-                        checked = app.isLocked,
+                        checked = app.isBlocked,
                         onCheckedChange = { newValue ->
                             onAppCheckedChange(app.packageName, newValue)
                         },

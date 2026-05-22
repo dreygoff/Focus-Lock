@@ -3,7 +3,7 @@ package com.gromov.focuslock.data.local.entity
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "locked_apps")
-data class LockedAppEntity(
+@Entity(tableName = "blocked_apps")
+data class BlockedAppEntity(
     @PrimaryKey val packageName: String
 )

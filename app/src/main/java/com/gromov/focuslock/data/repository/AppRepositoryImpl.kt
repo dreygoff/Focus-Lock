@@ -3,8 +3,8 @@ package com.gromov.focuslock.data.repository
 import android.content.Intent
 import android.content.pm.PackageManager
 import androidx.core.graphics.drawable.toBitmap
-import com.gromov.focuslock.data.local.dao.LockedAppDao
-import com.gromov.focuslock.data.local.entity.LockedAppEntity
+import com.gromov.focuslock.data.local.dao.BlockedAppDao
+import com.gromov.focuslock.data.local.entity.BlockedAppEntity
 import com.gromov.focuslock.domain.model.InstalledApp
 import com.gromov.focuslock.domain.repository.AppRepository
 import kotlinx.coroutines.Dispatchers
@@ -16,7 +16,7 @@ import javax.inject.Inject
 
 class AppRepositoryImpl @Inject constructor(
     private val packageManager: PackageManager,
-    private val lockedAppDao: LockedAppDao
+    private val blockedAppDao: BlockedAppDao
 ) : AppRepository {
 
     override fun getInstalledApps(): Flow<List<InstalledApp>> {
@@ -31,29 +31,31 @@ class AppRepositoryImpl @Inject constructor(
                     appName = resolveInfo.loadLabel(packageManager).toString(),
                     packageName = resolveInfo.activityInfo.packageName,
                     icon = drawableIcon.toBitmap(),
-                    isLocked = false
+                    isBlocked = false
                 )
             }.distinctBy { it.packageName }
             emit(apps)
         }.flowOn(Dispatchers.IO)
 
-        val lockedAppsFlow: Flow<List<String>> = lockedAppDao.getLockedApps()
-        return allAppsFlow.combine(lockedAppsFlow) { installedApps, lockedPackages ->
+        val blockedAppsFlow: Flow<List<String>> = getBlockedAppPackages()
+        return allAppsFlow.combine(blockedAppsFlow) { installedApps, lockedPackages ->
             val lockedSet = lockedPackages.toSet()
             installedApps.map { app ->
                 app.copy(
-                    isLocked = app.packageName in lockedSet
+                    isBlocked = app.packageName in lockedSet
                 )
             }
         }
     }
 
-    override suspend fun lockApp(packageName: String) {
-        // Оборачиваем строку в объект таблицы и отдаем в DAO
-        lockedAppDao.lockApp(LockedAppEntity(packageName))
+    override fun getBlockedAppPackages(): Flow<List<String>> = blockedAppDao.getBlockedApps()
+
+    override suspend fun blockApp(packageName: String) {
+        // Wrapping the string into an Entity object and passing it to the DAO
+        blockedAppDao.blockApp(BlockedAppEntity(packageName))
     }
 
-    override suspend fun unlockApp(packageName: String) {
-        lockedAppDao.unlockApp(packageName)
+    override suspend fun unblockApp(packageName: String) {
+        blockedAppDao.unblockApp(packageName)
     }
 }

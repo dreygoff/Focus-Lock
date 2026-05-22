@@ -7,11 +7,10 @@ import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class GetInstalledAppsUseCase @Inject constructor(
-    private val repository: AppRepository
+    private val appRepository: AppRepository
 ) {
-
     operator fun invoke(): Flow<List<InstalledApp>> {
-        return repository.getInstalledApps().map { list ->
+        return appRepository.getInstalledApps().map { list ->
             list.sortedBy { it.appName }
         }
     }
