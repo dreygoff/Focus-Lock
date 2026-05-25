@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">Focus Lock</string>
+    <string name="accessibility_service_description">App uses this service to detect when blocked apps are launched and timely activate focus mode.</string>
+</resources>
